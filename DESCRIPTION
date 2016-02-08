@@ -1,0 +1,11 @@
+Package: sparsestep
+Type: Package
+Title: SparseStep Regression
+Version: 0.1
+Authors@R: person("Gertjan", "van den Burg", email="sparsestep@gmail.com",
+		  role=c("aut", "cre"))
+Description: Implements the SparseStep regression model.
+Depends: R (>= 2.10)
+License: GPL-2
+URL: http://sparsestep.github.com
+LazyData: true
