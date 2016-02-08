@@ -85,7 +85,7 @@ sparsestep <- function(x, y, lambda=1.0, gamma0=1e6,
        	{
 		for (i in 1:IMsteps) {
 			alpha <- beta
-			omega <- gamma/(alpha^2 + gamma)^2
+			omega <- gamma^2/(alpha^2 + gamma^2)^2
 			Omega <- diag(as.vector(omega), m, m)
 			beta <- solve(XX + lambda * Omega, Xy)
 		}
@@ -100,7 +100,7 @@ sparsestep <- function(x, y, lambda=1.0, gamma0=1e6,
 	while ((lbar - loss)/loss > epsilon)
 	{
 		alpha <- beta
-		omega <- gamma/(alpha^2 + gamma)^2
+		omega <- gamma^2/(alpha^2 + gamma^2)^2
 		Omega <- diag(as.vector(omega), m, m)
 		beta <- solve(XX + lambda * Omega, Xy)
 		lbar <- loss
@@ -133,7 +133,7 @@ get.loss <- function(x, y, gamma, beta, lambda)
 	Xb <- x %*% beta
 	diff <- y - Xb
 	b2 <- beta^2
-	binv <- 1/(b2 + gamma)
+	binv <- 1/(b2 + gamma^2)
 	loss <- t(diff) %*% diff + lambda * t(b2) %*% binv
 	return(loss)
 }
