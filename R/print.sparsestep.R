@@ -6,6 +6,8 @@
 #'
 #' @export
 #'
+#' @aliases print
+#'
 #' @examples
 #' data(diabetes)
 #' attach(diabetes)
@@ -17,8 +19,6 @@ print.sparsestep <- function(obj, ...)
 {
 	cat("\nCall:\n")
 	dput(obj$call)
-	cat("R-squared:", format(round(rev(obj$R2)[1], 3)), "\n")
-	zeros <- length(which(obj$beta == 0))/length(obj$beta)*100.0
-	cat("Percentage coeff zero:", format(round(zeros, 2)), "\n")
+	cat("Lambda:", obj$lambda, "\n")
 	invisible(obj)
 }

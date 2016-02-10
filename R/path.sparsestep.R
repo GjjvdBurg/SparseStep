@@ -1,59 +1,100 @@
-#' @title Path algorithm for the SparseStep model
+#' @title Approximate path algorithm for the SparseStep model
 #'
 #' @description Fits the entire regularization path for SparseStep using a 
-#' Golden Section search.
+#' Golden Section search. Note that this algorithm is approximate, there is no 
+#' guarantee that the solutions _between_ induced values of lambdas do not 
+#' differ from those calculated. For instance, if solutions are calculated at 
+#' \eqn{\lambda_{i}}{\lambda[i]} and \eqn{\lambda_{i+1}}{\lambda[i+1]}, this 
+#' algorithm ensures that \eqn{\lambda_{i+1}}{\lambda[i+1]} has one more zero 
+#' than the solution at \eqn{\lambda_{i}}{\lambda[i]} (provided the recursion 
+#' depth is large enough). There is however no guarantee that there are no 
+#' different solutions between \eqn{\lambda_{i}}{\lambda[i]} and 
+#' \eqn{\lambda_{i+1}}{\lambda[i+1]}.  This is an ongoing research topic.
+#'
+#' Note that this path algorithm is not faster than running the 
+#' \code{sparsestep} function with the same \eqn{\lambda} sequence.
 #'
 #' @param x matrix of predictors
 #' @param y response
 #' @param max.depth maximum recursion depth
-#' @param ... further arguments to sparsestep()
+#' @param gamma0 starting value of the gamma parameter
+#' @param gammastop stopping value of the gamma parameter
+#' @param IMsteps number of steps of the majorization algorithm to perform for 
+#' each value of gamma
+#' @param gammastep factor to decrease gamma with at each step
+#' @param normalize if TRUE, each variable is standardized to have unit L2 
+#' norm, otherwise it is left alone.
+#' @param intercept if TRUE, an intercept is included in the model (and not 
+#' penalized), otherwise no intercept is included
+#' @param force.zero if TRUE, absolute coefficients smaller than the provided 
+#' threshold value are set to absolute zero as a post-processing step, 
+#' otherwise no thresholding is performed
+#' @param threshold threshold value to use for setting coefficients to 
+#' absolute zero
+#' @param XX The X'X matrix; useful for repeated runs where X'X stays the same
+#' @param Xy The X'y matrix; useful for repeated runs where X'y stays the same
+#' @param use.XX whether or not to compute X'X and return it
+#' @param use.Xy whether or not to compute X'y and return it
+#'
+#' @return A "sparsestep" S3 object is returned, for which print, predict, 
+#' coef, and plot methods exist. It has the following items:
+#' \item{call}{The call that was used to construct the model.}
+#' \item{lambda}{The value(s) of lambda used to construct the model.}
+#' \item{gamma0}{The gamma0 value of the model.}
+#' \item{gammastop}{The gammastop value of the model}
+#' \item{IMsteps}{The IMsteps value of the model}
+#' \item{gammastep}{The gammastep value of the model}
+#' \item{intercept}{Boolean indicating if an intercept was fitted in the 
+#' model}
+#' \item{force.zero}{Boolean indicating if a force zero-setting was 
+#' performed.}
+#' \item{threshold}{The threshold used for a forced zero-setting}
+#' \item{beta}{The resulting coefficients stored in a sparse matrix format 
+#' (dgCMatrix). This matrix has dimensions nvar x nlambda}
+#' \item{a0}{The intercept vector for each value of gamma of length nlambda}
+#' \item{normx}{Vector used to normalize the columns of x}
+#' \item{meanx}{Vector of column means of x}
+#' \item{XX}{The matrix X'X if use.XX was set to TRUE}
+#' \item{Xy}{The matrix X'y if use.Xy was set to TRUE}
+#'
+#' @author
+#' Gertjan van den Burg (author and maintainer).
 #'
 #' @export
 #'
-sparsestep.path <- function(x, y, max.depth=10, intercept=TRUE,
-			    normalize=TRUE, ...)
+#' @seealso
+#' \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}}, 
+#' \code{\link{plot}}, and \code{\link{sparsestep.path}}.
+#'
+#' @examples
+#' x <- matrix(rnorm(100*20), 100, 20)
+#' y <- rnorm(100)
+#' pth <- path.sparsestep(x, y)
+#'
+path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
+			    IMsteps=2, gammastep=2.0, normalize=TRUE,
+			    intercept=TRUE, force.zero=TRUE, threshold=1e-7,
+			    XX=NULL, Xy=NULL, use.XX = TRUE, use.Xy = TRUE)
 {
 	call <- match.call()
 
-	nm <- dim(x)
-	n <- nm[1]
-	m <- nm[2]
-	one <- rep(1, n)
-
-	if (intercept) {
-		meanx <- drop(one %*% x)/n
-		x <- scale(x, meanx, FALSE)
-		mu <- mean(y)
-		y <- drop(y - mu)
-	} else {
-		meanx <- rep(0, m)
-		mu <- 0
-		y <- drop(y)
-	}
-
-	if (normalize) {
-		normx <- sqrt(drop(one %*% (x^2)))
-		names(normx) <- NULL
-		x <- scale(x, FALSE, normx)
-		cat("Normalizing in path.sparsestep\n")
-	} else {
-		normx <- rep(1, m)
-	}
-
-	XX <- t(x) %*% x
-	Xy <- t(x) %*% y
+	prep <- preprocess(x, y, normalize, intercept, XX, Xy, use.XX, use.Xy)
+	nvars <- prep$nvars;
+	XX <- prep$XX;
+	Xy <- prep$Xy;
 
 	iter <- 0
 
 	# First find the smallest lambda for which all coefficients are zero
 	lambda.max <- 2^25
-	fit <- NULL
+	beta <- NULL
 	while (1) {
-		last.fit <- fit
-		fit <- sparsestep(x, y, lambda=lambda.max, normalize=FALSE, 
-				  XX=XX, Xy=Xy, ...)
+		last.beta <- beta
+		beta <- run.sparsestep(XX, Xy, nvars, lambda.max, gamma0,
+				      gammastep, gammastop, IMsteps,
+				      force.zero, threshold)
 		iter <- iter + 1
-		if (all(fit$beta == 0)) {
+		if (all(beta == 0)) {
 			lambda.max <- lambda.max / 2
 		} else {
 			lambda.max <- lambda.max * 2
@@ -62,21 +103,22 @@ sparsestep.path <- function(x, y, max.depth=10, intercept=TRUE,
 	}
 	cat("Found maximum value of lambda: 2^(", log(lambda.max)/log(2), ")\n")
 	iter <- iter + 1
-	if (is.null(last.fit)) {
-		betas.max <- fit$beta
+	if (is.null(last.beta)) {
+		betas.max <- beta
 	} else {
-		betas.max <- last.fit$beta
+		betas.max <- last.beta
 	}
 
 	# Now find the largest lambda for which no coefficients are zero
 	lambda.min <- 2^-12
-	fit <- NULL
+	beta <- NULL
 	while (1) {
-		last.fit <- fit
-		fit <- sparsestep(x, y, lambda=lambda.min, normalize=FALSE, 
-				  XX=XX, Xy=Xy, ...)
+		last.beta <- beta
+		beta <- run.sparsestep(XX, Xy, nvars, lambda.min, gamma0,
+				      gammastep, gammastop, IMsteps,
+				      force.zero, threshold)
 		iter <- iter + 1
-		if (all(fit$beta != 0)) {
+		if (all(beta != 0)) {
 			lambda.min <- lambda.min * 2
 		} else {
 			lambda.min <- lambda.min / 2
@@ -85,57 +127,67 @@ sparsestep.path <- function(x, y, max.depth=10, intercept=TRUE,
 	}
 	cat("Found minimum value of lambda: 2^(", log(lambda.min)/log(2), ")\n")
 	iter <- iter + 1
-	if (is.null(last.fit)) {
-		betas.min <- fit$beta
+	if (is.null(last.beta)) {
+		betas.min <- beta
 	} else {
-		betas.min <- last.fit$beta
+		betas.min <- last.beta
 	}
 
 	# Run binary section search
-	have.zeros <- as.vector(matrix(FALSE, 1, m+1))
+	have.zeros <- as.vector(matrix(FALSE, 1, nvars+1))
 	have.zeros[1] <- TRUE
-	have.zeros[m+1] <- TRUE
+	have.zeros[nvars+1] <- TRUE
 
 	left <- log(lambda.min)/log(2)
 	right <- log(lambda.max)/log(2)
 
-	l <- lambda.search(x, y, 0, max.depth, have.zeros, left, right, 1, 
-			   m+1, XX, Xy, ...)
+	l <- lambda.search(0, max.depth, have.zeros, left, right, 1, 
+			   nvars+1, XX, Xy, gamma0, gammastep, gammastop,
+			   IMsteps, force.zero, threshold)
 	have.zeros <- have.zeros | l$have.zeros
 	lambdas <- c(lambda.min, l$lambdas, lambda.max)
-	betas <- rbind(betas.min, l$betas, betas.max)
+	betas <- t(cbind(betas.min, l$betas, betas.max))
 	iter <- iter + l$iter
 
 	ord <- order(lambdas)
 	lambdas <- lambdas[ord]
 	betas <- betas[ord, ]
-	betas <- scale(betas, FALSE, normx)
 
-	object <- list(call=call, lambdas=lambdas, betas=betas,
-		       iterations=iter)
+	post <- postprocess(betas, prep$a0, x, prep$normx, nvars,
+			    length(lambdas))
+
+	object <- list(call = call, lambda = lambdas, gamma0 = gamma0,
+		       gammastop = gammastop, IMsteps = IMsteps,
+		       gammastep = gammastep, intercept = intercept,
+		       force.zero = force.zero, threshold = threshold,
+		       beta = post$beta, a0 = post$a0, normx = prep$normx,
+		       meanx = prep$meanx, XX = if(use.XX) XX else NULL,
+		       Xy = if(use.Xy) Xy else NULL)
+	class(object) <- "sparsestep"
+	return(object)
 }
 
-lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
-			  lidx, ridx, XX, Xy, ...)
+lambda.search <- function(depth, max.depth, have.zeros, left, right,
+			  lidx, ridx, XX, Xy, gamma0, gammastep, gammastop,
+			   IMsteps, force.zero, threshold)
 {
 	cat("Running search in interval [", left, ",", right, "] ... \n")
-	nm <- dim(x)
-	m <- nm[2]
+	nvars <- dim(XX)[1]
 
 	betas <- NULL
 	lambdas <- NULL
 
 	middle <- left + (right - left)/2
 	lambda <- 2^middle
-	fit <- sparsestep(x, y, lambda=lambda, normalize=FALSE, XX=XX, Xy=Xy, 
-			  ...)
+	beta <- run.sparsestep(XX, Xy, nvars, lambda, gamma0, gammastep,
+			       gammastop, IMsteps, force.zero, threshold)
 	iter <- 1
 
-	num.zero <- length(which(fit$beta == 0))
+	num.zero <- length(which(beta == 0))
 	cidx <- num.zero + 1
 	if (have.zeros[cidx] == FALSE) {
 		have.zeros[cidx] = TRUE
-		betas <- rbind(betas, as.vector(fit$beta))
+		betas <- cbind(betas, beta)
 		lambdas <- c(lambdas, lambda)
 	}
 
@@ -147,12 +199,13 @@ lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
 		b1 <- bnd[r, 1]
 		b2 <- bnd[r, 2]
 		if (depth < max.depth && any(have.zeros[i1:i2] == F)) {
-			ds <- lambda.search(x, y, depth+1, max.depth,
-					    have.zeros, b1, b2, i1, i2, XX, Xy,
-					    ...)
+			ds <- lambda.search(depth+1, max.depth, have.zeros,
+					    b1, b2, i1, i2, XX, Xy, gamma0,
+					    gammastep, gammastop, IMsteps,
+					    force.zero, threshold)
 			have.zeros <- have.zeros | ds$have.zeros
 			lambdas <- c(lambdas, ds$lambdas)
-			betas <- rbind(betas, ds$betas)
+			betas <- cbind(betas, ds$betas)
 			iter <- iter + ds$iter
 		}
 	}

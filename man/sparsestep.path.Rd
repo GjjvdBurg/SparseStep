@@ -2,10 +2,12 @@
 % Please edit documentation in R/path.sparsestep.R
 \name{sparsestep.path}
 \alias{sparsestep.path}
-\title{Path algorithm for the SparseStep model}
+\title{Approximate path algorithm for the SparseStep model}
 \usage{
-sparsestep.path(x, y, max.depth = 10, intercept = TRUE, normalize = TRUE,
-  ...)
+sparsestep.path(x, y, max.depth = 10, gamma0 = 1000, gammastop = 1e-04,
+  IMsteps = 2, gammastep = 2, normalize = TRUE, intercept = TRUE,
+  force.zero = TRUE, threshold = 1e-07, XX = NULL, Xy = NULL,
+  use.XX = TRUE, use.Xy = TRUE)
 }
 \arguments{
 \item{x}{matrix of predictors}
@@ -14,10 +16,79 @@ sparsestep.path(x, y, max.depth = 10, intercept = TRUE, normalize = TRUE,
 
 \item{max.depth}{maximum recursion depth}
 
-\item{...}{further arguments to sparsestep()}
+\item{gamma0}{starting value of the gamma parameter}
+
+\item{gammastop}{stopping value of the gamma parameter}
+
+\item{IMsteps}{number of steps of the majorization algorithm to perform for
+each value of gamma}
+
+\item{gammastep}{factor to decrease gamma with at each step}
+
+\item{normalize}{if TRUE, each variable is standardized to have unit L2
+norm, otherwise it is left alone.}
+
+\item{intercept}{if TRUE, an intercept is included in the model (and not
+penalized), otherwise no intercept is included}
+
+\item{force.zero}{if TRUE, absolute coefficients smaller than the provided
+threshold value are set to absolute zero as a post-processing step,
+otherwise no thresholding is performed}
+
+\item{threshold}{threshold value to use for setting coefficients to
+absolute zero}
+
+\item{XX}{The X'X matrix; useful for repeated runs where X'X stays the same}
+
+\item{Xy}{The X'y matrix; useful for repeated runs where X'y stays the same}
+
+\item{use.XX}{whether or not to compute X'X and return it}
+
+\item{use.Xy}{whether or not to compute X'y and return it}
+}
+\value{
+A "sparsestep" S3 object is returned, for which print, predict,
+coef, and plot methods exist. It has the following items:
+\item{call}{The call that was used to construct the model.}
+\item{lambda}{The value(s) of lambda used to construct the model.}
+\item{gamma0}{The gamma0 value of the model.}
+\item{gammastop}{The gammastop value of the model}
+\item{IMsteps}{The IMsteps value of the model}
+\item{gammastep}{The gammastep value of the model}
+\item{intercept}{Boolean indicating if an intercept was fitted in the
+model}
+\item{force.zero}{Boolean indicating if a force zero-setting was
+performed.}
+\item{threshold}{The threshold used for a forced zero-setting}
+\item{beta}{The resulting coefficients stored in a sparse matrix format
+(dgCMatrix). This matrix has dimensions nvar x nlambda}
+\item{a0}{The intercept vector for each value of gamma of length nlambda}
+\item{normx}{Vector used to normalize the columns of x}
+\item{meanx}{Vector of column means of x}
+\item{XX}{The matrix X'X if use.XX was set to TRUE}
+\item{Xy}{The matrix X'y if use.Xy was set to TRUE}
 }
 \description{
 Fits the entire regularization path for SparseStep using a
-Golden Section search.
+Golden Section search. Note that this algorithm is approximate, there is no
+guarantee that the solutions _between_ induced values of lambdas do not
+differ from those calculated. For instance, if solutions are calculated at
+\eqn{\lambda_{i}}{\lambda[i]} and \eqn{\lambda_{i+1}}{\lambda[i+1]}, this
+algorithm ensures that \eqn{\lambda_{i+1}}{\lambda[i+1]} has one more zero
+than the solution at \eqn{\lambda_{i}}{\lambda[i]} (provided the recursion
+depth is large enough). There is however no guarantee that there are no
+different solutions between \eqn{\lambda_{i}}{\lambda[i]} and
+\eqn{\lambda_{i+1}}{\lambda[i+1]}.  This is an ongoing research topic.
+
+Note that this path algorithm is not faster than running the
+\code{sparsestep} function with the same \code{\lambda} sequence.
+}
+\examples{
+x <- matrix(rnorm(100*20), 100, 20)
+y <- rnorm(100)
+pth <- sparsestep.path(x, y)
+}
+\author{
+Gertjan van den Burg (author and maintainer).
 }
 

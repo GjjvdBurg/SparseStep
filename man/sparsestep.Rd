@@ -6,10 +6,10 @@
 \alias{sparsestep-package}
 \title{Fits the SparseStep model}
 \usage{
-sparsestep(x, y, lambda = 1, gamma0 = 1e+06, gammastop = 1e-08,
-  IMsteps = 2, gammastep = 2, normalize = TRUE, intercept = TRUE,
-  force.zero = TRUE, threshold = 1e-07, XX = NULL, Xy = NULL,
-  use.XX = TRUE, use.Xy = TRUE)
+sparsestep(x, y, lambda = c(0.1, 0.5, 1, 5, 10), gamma0 = 1000,
+  gammastop = 1e-04, IMsteps = 2, gammastep = 2, normalize = TRUE,
+  intercept = TRUE, force.zero = TRUE, threshold = 1e-07, XX = NULL,
+  Xy = NULL, use.XX = TRUE, use.Xy = TRUE)
 }
 \arguments{
 \item{x}{matrix of predictors}
@@ -49,8 +49,26 @@ absolute zero}
 \item{use.Xy}{whether or not to compute X'y and return it}
 }
 \value{
-A "sparsestep" object is returned, for which predict, coef, methods
-exist.
+A "sparsestep" S3 object is returned, for which predict, coef, and
+plot methods exist. It has the following items:
+\item{call}{The call that was used to construct the model.}
+\item{lambda}{The value(s) of lambda used to construct the model.}
+\item{gamma0}{The gamma0 value of the model.}
+\item{gammastop}{The gammastop value of the model}
+\item{IMsteps}{The IMsteps value of the model}
+\item{gammastep}{The gammastep value of the model}
+\item{intercept}{Boolean indicating if an intercept was fitted in the
+model}
+\item{force.zero}{Boolean indicating if a force zero-setting was
+performed.}
+\item{threshold}{The threshold used for a forced zero-setting}
+\item{beta}{The resulting coefficients stored in a sparse matrix format
+(dgCMatrix). This matrix has dimensions nvar x nlambda}
+\item{a0}{The intercept vector for each value of gamma of length nlambda}
+\item{normx}{Vector used to normalize the columns of x}
+\item{meanx}{Vector of column means of x}
+\item{XX}{The matrix X'X if use.XX was set to TRUE}
+\item{Xy}{The matrix X'y if use.Xy was set to TRUE}
 }
 \description{
 Fits the SparseStep model for a single value of the
@@ -59,10 +77,15 @@ regularization parameter.
 sparsestep.
 }
 \examples{
-data(diabetes)
-attach(diabetes)
-object <- sparsestep(x, y)
-plot(object)
-detach(diabetes)
+x <- matrix(rnorm(100*20), 100, 20)
+y <- rnorm(100)
+fit <- sparsestep(x, y)
+}
+\author{
+Gertjan van den Burg (author and maintainer).
+}
+\seealso{
+\code{\link{coef}}, \code{\link{print}}, \code{\link{predict}},
+\code{\link{plot}}, and \code{\link{sparsestep.path}}.
 }
 

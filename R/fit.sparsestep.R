@@ -25,115 +25,68 @@
 #' @param use.XX whether or not to compute X'X and return it
 #' @param use.Xy whether or not to compute X'y and return it
 #'
-#' @return A "sparsestep" object is returned, for which predict, coef, methods 
-#' exist.
+#' @return A "sparsestep" S3 object is returned, for which print, predict, 
+#' coef, and plot methods exist. It has the following items:
+#' \item{call}{The call that was used to construct the model.}
+#' \item{lambda}{The value(s) of lambda used to construct the model.}
+#' \item{gamma0}{The gamma0 value of the model.}
+#' \item{gammastop}{The gammastop value of the model}
+#' \item{IMsteps}{The IMsteps value of the model}
+#' \item{gammastep}{The gammastep value of the model}
+#' \item{intercept}{Boolean indicating if an intercept was fitted in the 
+#' model}
+#' \item{force.zero}{Boolean indicating if a force zero-setting was 
+#' performed.}
+#' \item{threshold}{The threshold used for a forced zero-setting}
+#' \item{beta}{The resulting coefficients stored in a sparse matrix format 
+#' (dgCMatrix). This matrix has dimensions nvar x nlambda}
+#' \item{a0}{The intercept vector for each value of gamma of length nlambda}
+#' \item{normx}{Vector used to normalize the columns of x}
+#' \item{meanx}{Vector of column means of x}
+#' \item{XX}{The matrix X'X if use.XX was set to TRUE}
+#' \item{Xy}{The matrix X'y if use.Xy was set to TRUE}
+#'
+#' @author
+#' Gertjan van den Burg (author and maintainer).
+#'
+#' @seealso
+#' \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}}, 
+#' \code{\link{plot}}, and \code{\link{sparsestep.path}}.
 #'
 #' @export
 #'
 #' @examples
-#' data(diabetes)
-#' attach(diabetes)
-#' object <- sparsestep(x, y)
-#' plot(object)
-#' detach(diabetes)
+#' x <- matrix(rnorm(100*20), 100, 20)
+#' y <- rnorm(100)
+#' fit <- sparsestep(x, y)
 #'
-sparsestep <- function(x, y, lambda=1.0, gamma0=1e6, 
-		       gammastop=1e-8, IMsteps=2, gammastep=2.0, normalize=TRUE,
-		       intercept=TRUE, force.zero=TRUE, threshold=1e-7,
-		       XX=NULL, Xy=NULL, use.XX = TRUE, use.Xy = TRUE)
+sparsestep <- function(x, y, lambda=c(0.1, 0.5, 1.0, 5, 10), gamma0=1e3,
+		       gammastop=1e-4, IMsteps=2, gammastep=2.0,
+		       normalize=TRUE, intercept=TRUE, force.zero=TRUE,
+		       threshold=1e-7, XX=NULL, Xy=NULL, use.XX = TRUE,
+		       use.Xy = TRUE)
 {
 	call <- match.call()
+	prep <- preprocess(x, y, normalize, intercept, XX, Xy, use.XX, use.Xy)
 
-	nm <- dim(x)
-	n <- nm[1]
-	m <- nm[2]
-	one <- rep(1, n)
-
-	if (intercept) {
-		meanx <- drop(one %*% x)/n
-		x <- scale(x, meanx, FALSE)
-		mu <- mean(y)
-		y <- drop(y - mu)
-	} else {
-		meanx <- rep(0, m)
-		mu <- 0
-		y <- drop(y)
+	betas <- NULL
+	for (lmd in lambda) {
+		beta <- run.sparsestep(prep$XX, prep$Xy, prep$nvars, lmd,
+				       gamma0, gammastep, gammastop, IMsteps,
+				       force.zero, threshold)
+		betas <- cbind(beta, betas)
 	}
 
-	if (normalize) {
-		normx <- sqrt(drop(one %*% (x^2)))
-		names(normx) <- NULL
-		x <- scale(x, FALSE, normx)
-		cat("Normalizing in sparsestep\n")
-	} else {
-		normx <- rep(1, m)
-	}
+	post <- postprocess(t(betas), prep$a0, x, prep$normx, prep$nvars,
+			    length(lambda))
 
-	if (use.XX & is.null(XX)) {
-		XX <- t(x) %*% x
-	}
-	if (use.Xy & is.null(Xy)) {
-		Xy <- t(x) %*% y
-	}
-
-	# Start solving SparseStep	
-	gamma <- gamma0
-	beta <- matrix(0.0, m, 1)
-
-	it <- 0
-	while (gamma > gammastop)
-       	{
-		for (i in 1:IMsteps) {
-			alpha <- beta
-			omega <- gamma^2/(alpha^2 + gamma^2)^2
-			Omega <- diag(as.vector(omega), m, m)
-			beta <- solve(XX + lambda * Omega, Xy)
-		}
-		it <- it + 1
-		gamma <- gamma / gammastep
-	}
-
-	# perform IM until convergence
-	epsilon <- 1e-14
-	loss <- get.loss(x, y, gamma, beta, lambda)
-	lbar <- (1.0 + 2.0 * epsilon) * loss
-	while ((lbar - loss)/loss > epsilon)
-	{
-		alpha <- beta
-		omega <- gamma^2/(alpha^2 + gamma^2)^2
-		Omega <- diag(as.vector(omega), m, m)
-		beta <- solve(XX + lambda * Omega, Xy)
-		lbar <- loss
-		loss <- get.loss(x, y, gamma, beta, lambda)
-	}
-
-	# postprocessing
-	if (force.zero) {
-		beta[which(abs(beta) < threshold)] <- 0
-	}
-	residuals <- y - x %*% beta
-	beta <- scale(t(beta), FALSE, normx)
-	RSS <- apply(residuals^2, 2, sum)
-	R2 <- 1 - RSS/RSS[1]
-
-	object <- list(call = call, lambda = lambda, R2 = R2, RSS = RSS,
-		       gamma0 = gamma0, gammastop = gammastop,
-		       IMsteps = IMsteps, gammastep = gammastep,
-		       intercept = intercept, force.zero = force.zero,
-		       threshold = threshold, beta = beta, mu = mu,
-		       normx = normx, meanx = meanx,
-		       XX = if(use.XX) XX else NULL,
-		       Xy = if(use.Xy) Xy else NULL)
+	object <- list(call = call, lambda = lambda, gamma0 = gamma0,
+		       gammastop = gammastop, IMsteps = IMsteps,
+		       gammastep = gammastep, intercept = intercept,
+		       force.zero = force.zero, threshold = threshold,
+		       beta = post$beta, a0 = post$a0, normx = prep$normx,
+		       meanx = prep$meanx, XX = if(use.XX) prep$XX else NULL,
+		       Xy = if(use.Xy) prep$Xy else NULL)
 	class(object) <- "sparsestep"
 	return(object)
-}
-
-get.loss <- function(x, y, gamma, beta, lambda)
-{
-	Xb <- x %*% beta
-	diff <- y - Xb
-	b2 <- beta^2
-	binv <- 1/(b2 + gamma^2)
-	loss <- t(diff) %*% diff + lambda * t(b2) %*% binv
-	return(loss)
 }
