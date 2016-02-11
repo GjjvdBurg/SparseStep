@@ -57,14 +57,11 @@
 #' \item{XX}{The matrix X'X if use.XX was set to TRUE}
 #' \item{Xy}{The matrix X'y if use.Xy was set to TRUE}
 #'
-#' @author
-#' Gertjan van den Burg (author and maintainer).
-#'
 #' @export
 #'
 #' @seealso
 #' \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}}, 
-#' \code{\link{plot}}, and \code{\link{sparsestep.path}}.
+#' \code{\link{plot}}, and \code{\link{sparsestep}}.
 #'
 #' @examples
 #' x <- matrix(rnorm(100*20), 100, 20)
@@ -90,9 +87,10 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 	beta <- NULL
 	while (1) {
 		last.beta <- beta
-		beta <- run.sparsestep(XX, Xy, nvars, lambda.max, gamma0,
-				      gammastep, gammastop, IMsteps,
-				      force.zero, threshold)
+		beta <- run.sparsestep(prep$x, prep$y, XX, Xy, nvars,
+				       lambda.max, gamma0, gammastep,
+				       gammastop, IMsteps, force.zero,
+				       threshold)
 		iter <- iter + 1
 		if (all(beta == 0)) {
 			lambda.max <- lambda.max / 2
@@ -114,9 +112,10 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 	beta <- NULL
 	while (1) {
 		last.beta <- beta
-		beta <- run.sparsestep(XX, Xy, nvars, lambda.min, gamma0,
-				      gammastep, gammastop, IMsteps,
-				      force.zero, threshold)
+		beta <- run.sparsestep(prep$x, prep$y, XX, Xy, nvars,
+				       lambda.min, gamma0, gammastep,
+				       gammastop, IMsteps, force.zero,
+				       threshold)
 		iter <- iter + 1
 		if (all(beta != 0)) {
 			lambda.min <- lambda.min * 2
@@ -141,9 +140,9 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 	left <- log(lambda.min)/log(2)
 	right <- log(lambda.max)/log(2)
 
-	l <- lambda.search(0, max.depth, have.zeros, left, right, 1, 
-			   nvars+1, XX, Xy, gamma0, gammastep, gammastop,
-			   IMsteps, force.zero, threshold)
+	l <- lambda.search(prep$x, prep$y, 0, max.depth, have.zeros, left,
+			   right, 1, nvars+1, XX, Xy, gamma0, gammastep,
+			   gammastop, IMsteps, force.zero, threshold)
 	have.zeros <- have.zeros | l$have.zeros
 	lambdas <- c(lambda.min, l$lambdas, lambda.max)
 	betas <- t(cbind(betas.min, l$betas, betas.max))
@@ -153,7 +152,7 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 	lambdas <- lambdas[ord]
 	betas <- betas[ord, ]
 
-	post <- postprocess(betas, prep$a0, x, prep$normx, nvars,
+	post <- postprocess(betas, prep$a0, prep$x, prep$normx, nvars,
 			    length(lambdas))
 
 	object <- list(call = call, lambda = lambdas, gamma0 = gamma0,
@@ -167,7 +166,7 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 	return(object)
 }
 
-lambda.search <- function(depth, max.depth, have.zeros, left, right,
+lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
 			  lidx, ridx, XX, Xy, gamma0, gammastep, gammastop,
 			   IMsteps, force.zero, threshold)
 {
@@ -179,7 +178,7 @@ lambda.search <- function(depth, max.depth, have.zeros, left, right,
 
 	middle <- left + (right - left)/2
 	lambda <- 2^middle
-	beta <- run.sparsestep(XX, Xy, nvars, lambda, gamma0, gammastep,
+	beta <- run.sparsestep(x, y, XX, Xy, nvars, lambda, gamma0, gammastep,
 			       gammastop, IMsteps, force.zero, threshold)
 	iter <- 1
 
@@ -199,10 +198,10 @@ lambda.search <- function(depth, max.depth, have.zeros, left, right,
 		b1 <- bnd[r, 1]
 		b2 <- bnd[r, 2]
 		if (depth < max.depth && any(have.zeros[i1:i2] == F)) {
-			ds <- lambda.search(depth+1, max.depth, have.zeros,
-					    b1, b2, i1, i2, XX, Xy, gamma0,
-					    gammastep, gammastop, IMsteps,
-					    force.zero, threshold)
+			ds <- lambda.search(x, y, depth+1, max.depth,
+					    have.zeros, b1, b2, i1, i2, XX,
+					    Xy, gamma0, gammastep, gammastop,
+					    IMsteps, force.zero, threshold)
 			have.zeros <- have.zeros | ds$have.zeros
 			lambdas <- c(lambdas, ds$lambdas)
 			betas <- cbind(betas, ds$betas)

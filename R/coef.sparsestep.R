@@ -2,7 +2,8 @@
 #'
 #' @description Returns the coefficients of the SparseStep model.
 #'
-#' @param obj a "sparsestep" object
+#' @param object a "sparsestep" object
+#' @param ... further argument are ignored
 #'
 #' @return The coefficients of the SparseStep model (i.e. the betas). If the
 #' model was fitted with an intercept this will be the first value in the
@@ -17,12 +18,12 @@
 #' fit <- sparsestep(x, y)
 #' coef(fit)
 #'
-coef.sparsestep <- function(obj, ...)
+coef.sparsestep <- function(object, ...)
 {
-  if (obj$intercept) {
-    beta <- rbind(obj$a0, obj$beta)
+  if (object$intercept) {
+    beta <- rbind(object$a0, object$beta)
   } else {
-    beta <- obj$beta
+    beta <- object$beta
   }
   nbeta <- drop0(Matrix(as.matrix(beta)))
 

@@ -20,7 +20,6 @@ preprocess <- function(x, y, normalize, intercept, XX, Xy, use.XX, use.Xy)
 		normx <- sqrt(drop(one %*% (x^2)))
 		names(normx) <- NULL
 		x <- scale(x, FALSE, normx)
-		cat("Normalizing in sparsestep\n")
 	} else {
 		normx <- rep(1, nvars)
 	}
@@ -32,7 +31,7 @@ preprocess <- function(x, y, normalize, intercept, XX, Xy, use.XX, use.Xy)
 		Xy <- t(x) %*% y
 	}
 
-	out <- list(nvars = nvars, normx = normx, a0 = a0,
+	out <- list(x = x, y = y, nvars = nvars, normx = normx, a0 = a0,
 		    XX = XX, Xy = Xy, meanx = meanx)
 	return(out)
 }

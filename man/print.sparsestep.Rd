@@ -5,19 +5,20 @@
 \alias{print.sparsestep}
 \title{Print the fitted SparseStep model}
 \usage{
-\method{print}{sparsestep}(obj, ...)
+\method{print}{sparsestep}(x, ...)
 }
 \arguments{
-\item{obj}{a "sparsestep" object to print}
+\item{x}{a "sparsestep" object to print}
+
+\item{...}{further argument are ignored}
 }
 \description{
 Prints a short text of a fitted SparseStep model
 }
 \examples{
-data(diabetes)
-attach(diabetes)
-object <- sparsestep(x, y)
-print(object)
-detach(diabetes)
+x <- matrix(rnorm(100*20), 100, 20)
+y <- rnorm(100)
+fit <- sparsestep(x, y)
+print(fit)
 }
 

@@ -1,8 +1,8 @@
 # Core SparseStep routine. This could be implemented in a low-level language 
 # in the future, if necessary.
 #
-run.sparsestep <- function(XX, Xy, nvars, lambda, gamma0, gammastep, gammastop,
-			   IMsteps, force.zero, threshold) {
+run.sparsestep <- function(x, y, XX, Xy, nvars, lambda, gamma0, gammastep,
+			   gammastop, IMsteps, force.zero, threshold) {
 	# Start solving SparseStep
 	gamma <- gamma0
 	beta <- matrix(0.0, nvars, 1)
