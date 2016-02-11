@@ -8,9 +8,9 @@
 \method{print}{sparsestep}(x, ...)
 }
 \arguments{
-\item{x}{a "sparsestep" object to print}
+\item{x}{a \code{sparsestep} object to print}
 
-\item{...}{further argument are ignored}
+\item{\dots}{further argument are ignored}
 }
 \description{
 Prints a short text of a fitted SparseStep model

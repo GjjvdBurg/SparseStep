@@ -2,8 +2,8 @@
 #'
 #' @description Returns the coefficients of the SparseStep model.
 #'
-#' @param object a "sparsestep" object
-#' @param ... further argument are ignored
+#' @param object a \code{sparsestep} object
+#' @param \dots further argument are ignored
 #'
 #' @return The coefficients of the SparseStep model (i.e. the betas). If the
 #' model was fitted with an intercept this will be the first value in the

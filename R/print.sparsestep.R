@@ -2,8 +2,8 @@
 #'
 #' @description Prints a short text of a fitted SparseStep model
 #'
-#' @param x a "sparsestep" object to print
-#' @param ... further argument are ignored
+#' @param x a \code{sparsestep} object to print
+#' @param \dots further argument are ignored
 #'
 #' @export
 #'

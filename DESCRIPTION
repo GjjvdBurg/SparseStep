@@ -2,12 +2,10 @@ Package: sparsestep
 Type: Package
 Title: SparseStep Regression
 Version: 0.1
-Authors@R: c(person("Gertjan", "van den Burg", email="sparsestep@gmail.com",
-		  role=c("aut", "cre")), person("Andreas", "Alfons", 
-email="alfons@ese.eur.nl", role="ctb"), person("Patrick, "Groenen", 
-email="groenen@ese.eur.nl", role="ctb"))
-Author: Gertjan van den Burg [aut, cre], Andreas Alfons [ctb], Patrick Groenen 
-[ctb]
+Authors@R: c(person("Gertjan", "van den Burg", email="sparsestep@gmail.com", role=c("aut", "cre")),
+ person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"),
+ person("Patrick", "Groenen", email="groenen@ese.eur.nl", role="ctb"))
+Author: Gertjan van den Burg [aut, cre], Andreas Alfons [ctb], Patrick Groenen [ctb]
 Maintainer: Gertjan van den Burg <sparsestep@gmail.com>
 Description: Implements the SparseStep regression model.
 Depends: Matrix (>= 1.0-6)

@@ -3,7 +3,7 @@
 #' @description Plot the coefficients of the SparseStep path
 #'
 #' @param x a \code{sparsestep} object
-#' @param ... further argument to matplot
+#' @param \dots further argument to matplot
 #'
 #' @export
 #' @aliases plot

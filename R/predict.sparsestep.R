@@ -3,9 +3,10 @@
 #' @description Predicts the outcome variable for the SparseStep model for 
 #' each value of lambda supplied to the model.
 #'
-#' @param object Fitted "sparsestep" object
-#' @param newx Matrix of new values for `x` at which predictions are to be made.
-#' @param ... further argument are ignored
+#' @param object Fitted \code{sparsestep} object
+#' @param newx Matrix of new values for \code{x} at which predictions are to 
+#' be made.
+#' @param \dots further argument are ignored
 #'
 #' @return a matrix of numerical predictions of size nobs x nlambda
 #'
