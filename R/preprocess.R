@@ -18,6 +18,7 @@ preprocess <- function(x, y, normalize, intercept, XX, Xy, use.XX, use.Xy)
 
 	if (normalize) {
 		normx <- sqrt(drop(one %*% (x^2)))
+		normx <- sqrt(nobs) * normx
 		names(normx) <- NULL
 		x <- scale(x, FALSE, normx)
 	} else {
