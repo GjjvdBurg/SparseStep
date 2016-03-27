@@ -22,8 +22,8 @@
 #' absolute zero
 #' @param XX The X'X matrix; useful for repeated runs where X'X stays the same
 #' @param Xy The X'y matrix; useful for repeated runs where X'y stays the same
-#' @param use.XX whether or not to compute X'X and return it
-#' @param use.Xy whether or not to compute X'y and return it
+#' @param use.XX whether or not to compute X'X and return it (boolean)
+#' @param use.Xy whether or not to compute X'y and return it (boolean)
 #'
 #' @return A "sparsestep" S3 object is returned, for which print, predict, 
 #' coef, and plot methods exist. It has the following items:
