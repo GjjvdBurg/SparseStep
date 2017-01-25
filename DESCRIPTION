@@ -1,14 +1,17 @@
 Package: sparsestep
-Type: Package
+Version: 1.0.0
+Date: 2017-01-25
 Title: SparseStep Regression
-Version: 0.1
-Authors@R: c(person("Gertjan", "van den Burg", email="sparsestep@gmail.com", role=c("aut", "cre")),
- person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"),
- person("Patrick", "Groenen", email="groenen@ese.eur.nl", role="ctb"))
-Author: Gertjan van den Burg [aut, cre], Andreas Alfons [ctb], Patrick Groenen [ctb]
-Maintainer: Gertjan van den Burg <sparsestep@gmail.com>
-Description: Implements the SparseStep regression model.
-Depends: Matrix (>= 1.0-6)
-License: GPL-2
-URL: http://sparsestep.github.com
-LazyData: true
+Authors@R: c(person("Gerrit J.J.", "van den Burg", role=c("aut", "cre"), 
+                    email="gertjanvandenburg@gmail.com"), 
+              person("Patrick J.F.", "Groenen", email="groenen@ese.eur.nl", role="ctb"), 
+              person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"))
+Description: Implements the SparseStep model for solving regression
+    problems with a sparsity constraint on the parameters.
+License: GPL (>= 2)
+Imports: graphics
+Depends:
+    R (>= 3.0.0),
+    Matrix (>= 1.0-6)
+URL: https://github.com/GjjvdBurg/SparseStep
+RoxygenNote: 5.0.1
