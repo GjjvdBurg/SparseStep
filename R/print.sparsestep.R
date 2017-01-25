@@ -14,8 +14,9 @@
 #'  \emph{SparseStep: Approximating the Counting Norm for Sparse Regularization},
 #'  arXiv preprint arXiv:1701.06967 [stat.ME]. 
 #'  URL \url{https://arxiv.org/abs/1701.06967}.
-#' @export
 #'
+#' @method print sparsestep
+#' @export
 #'
 #' @examples
 #' x <- matrix(rnorm(100*20), 100, 20)
