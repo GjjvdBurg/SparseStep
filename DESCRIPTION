@@ -2,9 +2,9 @@ Package: sparsestep
 Version: 1.0.0
 Date: 2017-01-25
 Title: SparseStep Regression
-Authors@R: c(person("Gerrit J.J.", "van den Burg", role=c("aut", "cre"), 
+Authors@R: c(person("Gertjan", "van den Burg", role=c("aut", "cre"), 
                     email="gertjanvandenburg@gmail.com"), 
-              person("Patrick J.F.", "Groenen", email="groenen@ese.eur.nl", role="ctb"), 
+              person("Patrick", "Groenen", email="groenen@ese.eur.nl", role="ctb"), 
               person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"))
 Description: Implements the SparseStep model for solving regression
     problems with a sparsity constraint on the parameters.
