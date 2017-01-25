@@ -35,6 +35,7 @@
 #' @param Xy The X'y matrix; useful for repeated runs where X'y stays the same
 #' @param use.XX whether or not to compute X'X and return it
 #' @param use.Xy whether or not to compute X'y and return it
+#' @param quiet don't print search info while running
 #'
 #' @return A "sparsestep" S3 object is returned, for which print, predict, 
 #' coef, and plot methods exist. It has the following items:
@@ -81,7 +82,7 @@
 path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 			    IMsteps=2, gammastep=2.0, normalize=TRUE,
 			    intercept=TRUE, force.zero=TRUE, threshold=1e-7,
-			    XX=NULL, Xy=NULL, use.XX = TRUE, use.Xy = TRUE)
+			    XX=NULL, Xy=NULL, use.XX=TRUE, use.Xy=TRUE, quiet=FALSE)
 {
 	call <- match.call()
 
@@ -109,7 +110,11 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 			break
 		}
 	}
-	cat("Found maximum value of lambda: 2^(", log(lambda.max)/log(2), ")\n")
+
+    if (!quiet) {
+        cat("Found maximum value of lambda: 2^(", log(lambda.max)/log(2), ")\n")
+    }
+
 	iter <- iter + 1
 	if (is.null(last.beta)) {
 		betas.max <- beta
@@ -134,7 +139,9 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 			break
 		}
 	}
-	cat("Found minimum value of lambda: 2^(", log(lambda.min)/log(2), ")\n")
+    if (!quiet) {
+        cat("Found minimum value of lambda: 2^(", log(lambda.min)/log(2), ")\n")
+    }
 	iter <- iter + 1
 	if (is.null(last.beta)) {
 		betas.min <- beta
@@ -152,7 +159,7 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 
 	l <- lambda.search(prep$x, prep$y, 0, max.depth, have.zeros, left,
 			   right, 1, nvars+1, XX, Xy, gamma0, gammastep,
-			   gammastop, IMsteps, force.zero, threshold)
+			   gammastop, IMsteps, force.zero, threshold, quiet)
 	have.zeros <- have.zeros | l$have.zeros
 	lambdas <- c(lambda.min, l$lambdas, lambda.max)
 	betas <- t(cbind(betas.min, l$betas, betas.max))
@@ -178,10 +185,12 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 
 lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
 			  lidx, ridx, XX, Xy, gamma0, gammastep, gammastop,
-			   IMsteps, force.zero, threshold)
+			   IMsteps, force.zero, threshold, quiet)
 {
-	cat("Running search in interval [", left, ",", right, "] ... \n")
-	nvars <- dim(XX)[1]
+    if (!quiet) {
+        cat("Running search in interval [", left, ",", right, "] ... \n")
+    }
+    nvars <- dim(XX)[1]
 
 	betas <- NULL
 	lambdas <- NULL
@@ -211,7 +220,7 @@ lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
 			ds <- lambda.search(x, y, depth+1, max.depth,
 					    have.zeros, b1, b2, i1, i2, XX,
 					    Xy, gamma0, gammastep, gammastop,
-					    IMsteps, force.zero, threshold)
+					    IMsteps, force.zero, threshold, quiet)
 			have.zeros <- have.zeros | ds$have.zeros
 			lambdas <- c(lambdas, ds$lambdas)
 			betas <- cbind(betas, ds$betas)

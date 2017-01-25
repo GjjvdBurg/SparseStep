@@ -7,7 +7,7 @@
 path.sparsestep(x, y, max.depth = 10, gamma0 = 1000, gammastop = 1e-04,
   IMsteps = 2, gammastep = 2, normalize = TRUE, intercept = TRUE,
   force.zero = TRUE, threshold = 1e-07, XX = NULL, Xy = NULL,
-  use.XX = TRUE, use.Xy = TRUE)
+  use.XX = TRUE, use.Xy = TRUE, quiet = FALSE)
 }
 \arguments{
 \item{x}{matrix of predictors}
@@ -45,6 +45,8 @@ absolute zero}
 \item{use.XX}{whether or not to compute X'X and return it}
 
 \item{use.Xy}{whether or not to compute X'y and return it}
+
+\item{quiet}{don't print search info while running}
 }
 \value{
 A "sparsestep" S3 object is returned, for which print, predict, 
