@@ -38,6 +38,16 @@
 #'  arXiv preprint arXiv:1701.06967 [stat.ME]. 
 #'  URL \url{https://arxiv.org/abs/1701.06967}.
 #'
+#' @examples
+#' x <- matrix(rnorm(100*20), 100, 20)
+#' y <- rnorm(100)
+#' fit <- sparsestep(x, y)
+#' plot(fit)
+#' fits <- path.sparsestep(x, y)
+#' plot(fits)
+#' x2 <- matrix(rnorm(50*20), 50, 20)
+#' y2 <- predict(fits, x2)
+#'
 #' @name sparsestep-package
 #' @docType package
 #' @import Matrix

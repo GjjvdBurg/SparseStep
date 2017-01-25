@@ -1,6 +1,6 @@
-#' @title Fits the SparseStep model
+#' @title Fit the SparseStep model
 #'
-#' @description Fits the SparseStep model for a single value of the 
+#' @description Fits the SparseStep model for a chosen values of the 
 #' regularization parameter.
 #'
 #' @param x matrix of predictors

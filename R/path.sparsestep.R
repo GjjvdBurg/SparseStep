@@ -68,6 +68,7 @@
 #'  \emph{SparseStep: Approximating the Counting Norm for Sparse Regularization},
 #'  arXiv preprint arXiv:1701.06967 [stat.ME]. 
 #'  URL \url{https://arxiv.org/abs/1701.06967}.
+#'
 #' @seealso
 #' \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}}, 
 #' \code{\link{plot}}, and \code{\link{sparsestep}}.

@@ -5,9 +5,10 @@
 #' @param object a \code{sparsestep} object
 #' @param \dots further argument are ignored
 #'
-#' @return The coefficients of the SparseStep model (i.e. the betas). If the
-#' model was fitted with an intercept this will be the first value in the
-#' resulting vector.
+#' @return The coefficients of the SparseStep model (i.e. the betas) as a 
+#' dgCMatrix. If the model was fitted with an intercept this will be the first
+#' row in the resulting matrix.
+#'
 #' @author
 #' Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons\cr
 #' Maintainer: Gerrit J.J. van den Burg <gertjanvandenburg@gmail.com>
