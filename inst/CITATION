@@ -1,0 +1,23 @@
+citHeader("To site SparseStep in publications use:")
+
+bibentry(bibtype="article",
+  key="van2017sparsestep",
+  title= "{SparseStep}: Approximating the Counting Norm for Sparse Regularization",
+  author = personList(
+    as.person("Gerrit J.J. van den Burg"),
+    as.person("Patrick J.F. Groenen"),
+    as.person("Andreas Alfons")
+  ),
+  journal = "arXiv preprint arXiv:1701.06967",
+  archivePrefix = "arXiv",
+  year = "2017",
+  eprint = "1701.06967",
+  url = "https://arxiv.org/abs/1701.06967",
+  primaryClass = "stat.ME",
+  keywords = "Statistics - Methodology, 62J05, 62J07",
+  textVersion = paste(
+    "Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons (2017).",
+    "SparseStep: Approximating the Counting Norm for Sparse Regularization.",
+    "arXiv preprint arXiv:1701.06967 [stat.ME]."
+    )
+)
