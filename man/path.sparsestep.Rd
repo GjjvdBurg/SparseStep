@@ -87,6 +87,17 @@ Note that this path algorithm is not faster than running the
 x <- matrix(rnorm(100*20), 100, 20)
 y <- rnorm(100)
 pth <- path.sparsestep(x, y)
+
+}
+\author{
+Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons\cr
+Maintainer: Gerrit J.J. van den Burg <gertjanvandenburg@gmail.com>
+}
+\references{
+Van den Burg, G.J.J., Groenen, P.J.F. and Alfons, A. (2017).
+ \emph{SparseStep: Approximating the Counting Norm for Sparse Regularization},
+ arXiv preprint arXiv:1701.06967 [stat.ME]. 
+ URL \url{https://arxiv.org/abs/1701.06967}.
 }
 \seealso{
 \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}},

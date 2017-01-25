@@ -29,7 +29,14 @@
 #' }
 #'
 #' @author
-#' Gertjan van den Burg (author and maintainer).
+#' Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons\cr
+#' Maintainer: Gerrit J.J. van den Burg <gertjanvandenburg@gmail.com>
+#'
+#' @references
+#' Van den Burg, G.J.J., Groenen, P.J.F. and Alfons, A. (2017).
+#'  \emph{SparseStep: Approximating the Counting Norm for Sparse Regularization},
+#'  arXiv preprint arXiv:1701.06967 [stat.ME]. 
+#'  URL \url{https://arxiv.org/abs/1701.06967}.
 #'
 #' @name sparsestep-package
 #' @docType package
