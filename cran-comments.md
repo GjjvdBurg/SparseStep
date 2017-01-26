@@ -1,3 +1,10 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Expanded the Description field with a reference to the paper and more 
+  information on the method.
+* Added MSC classifications and updated URLSs in the description file.
+
 ## Test environments
 * local Arch Linux install, R version 3.3.2
 * win-builder (devel and release)
