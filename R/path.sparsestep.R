@@ -82,7 +82,8 @@
 path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 			    IMsteps=2, gammastep=2.0, normalize=TRUE,
 			    intercept=TRUE, force.zero=TRUE, threshold=1e-7,
-			    XX=NULL, Xy=NULL, use.XX=TRUE, use.Xy=TRUE, quiet=FALSE)
+			    XX=NULL, Xy=NULL, use.XX=TRUE, use.Xy=TRUE,
+			    quiet=FALSE)
 {
 	call <- match.call()
 
@@ -111,9 +112,9 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 		}
 	}
 
-    if (!quiet) {
-        cat("Found maximum value of lambda: 2^(", log(lambda.max)/log(2), ")\n")
-    }
+	if (!quiet) {
+		cat("Found maximum value of lambda: 2^(", log(lambda.max)/log(2), ")\n")
+	}
 
 	iter <- iter + 1
 	if (is.null(last.beta)) {
@@ -139,9 +140,9 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 			break
 		}
 	}
-    if (!quiet) {
-        cat("Found minimum value of lambda: 2^(", log(lambda.min)/log(2), ")\n")
-    }
+	if (!quiet) {
+		cat("Found minimum value of lambda: 2^(", log(lambda.min)/log(2), ")\n")
+	}
 	iter <- iter + 1
 	if (is.null(last.beta)) {
 		betas.min <- beta
@@ -185,12 +186,12 @@ path.sparsestep <- function(x, y, max.depth=10, gamma0=1e3, gammastop=1e-4,
 
 lambda.search <- function(x, y, depth, max.depth, have.zeros, left, right,
 			  lidx, ridx, XX, Xy, gamma0, gammastep, gammastop,
-			   IMsteps, force.zero, threshold, quiet)
+			  IMsteps, force.zero, threshold, quiet)
 {
-    if (!quiet) {
-        cat("Running search in interval [", left, ",", right, "] ... \n")
-    }
-    nvars <- dim(XX)[1]
+	if (!quiet) {
+		cat("Running search in interval [", left, ",", right, "] ... \n")
+	}
+	nvars <- dim(XX)[1]
 
 	betas <- NULL
 	lambdas <- NULL
