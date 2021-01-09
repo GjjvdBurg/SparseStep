@@ -4,10 +4,24 @@
 \alias{path.sparsestep}
 \title{Approximate path algorithm for the SparseStep model}
 \usage{
-path.sparsestep(x, y, max.depth = 10, gamma0 = 1000, gammastop = 1e-04,
-  IMsteps = 2, gammastep = 2, normalize = TRUE, intercept = TRUE,
-  force.zero = TRUE, threshold = 1e-07, XX = NULL, Xy = NULL,
-  use.XX = TRUE, use.Xy = TRUE, quiet = FALSE)
+path.sparsestep(
+  x,
+  y,
+  max.depth = 10,
+  gamma0 = 1000,
+  gammastop = 1e-04,
+  IMsteps = 2,
+  gammastep = 2,
+  normalize = TRUE,
+  intercept = TRUE,
+  force.zero = TRUE,
+  threshold = 1e-07,
+  XX = NULL,
+  Xy = NULL,
+  use.XX = TRUE,
+  use.Xy = TRUE,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{x}{matrix of predictors}
@@ -91,10 +105,6 @@ y <- rnorm(100)
 pth <- path.sparsestep(x, y)
 
 }
-\author{
-Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons\cr
-Maintainer: Gerrit J.J. van den Burg <gertjanvandenburg@gmail.com>
-}
 \references{
 Van den Burg, G.J.J., Groenen, P.J.F. and Alfons, A. (2017).
  \emph{SparseStep: Approximating the Counting Norm for Sparse Regularization},
@@ -105,4 +115,7 @@ Van den Burg, G.J.J., Groenen, P.J.F. and Alfons, A. (2017).
 \code{\link{coef}}, \code{\link{print}}, \code{\link{predict}}, 
 \code{\link{plot}}, and \code{\link{sparsestep}}.
 }
-
+\author{
+Gerrit J.J. van den Burg, Patrick J.F. Groenen, Andreas Alfons\cr
+Maintainer: Gerrit J.J. van den Burg <gertjanvandenburg@gmail.com>
+}
