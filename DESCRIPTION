@@ -1,6 +1,6 @@
 Package: sparsestep
-Version: 1.0.0
-Date: 2017-01-26
+Version: 1.0.1
+Date: 2021-01-09
 Title: SparseStep Regression
 Authors@R: c(person("Gertjan", "van den Burg", role=c("aut", "cre"), 
                     email="gertjanvandenburg@gmail.com"), 
