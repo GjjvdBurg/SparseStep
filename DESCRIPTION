@@ -7,15 +7,15 @@ Authors@R: c(person("Gertjan", "van den Burg", role=c("aut", "cre"),
               person("Patrick", "Groenen", email="groenen@ese.eur.nl", role="ctb"), 
               person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"))
 Description: Implements the SparseStep model for solving regression
-    problems with a sparsity constraint on the parameters. The SparseStep 
-    regression model was proposed in Van den Burg, Groenen, and Alfons (2017) 
-    <https://arxiv.org/abs/1701.06967>. In the model, a regularization term is 
-    added to the regression problem which approximates the counting norm of 
-    the parameters.  By iteratively improving the approximation a sparse 
-    solution to the regression problem can be obtained.  In this package both 
-    the standard SparseStep algorithm is implemented as well as a path 
-    algorithm which uses golden section search to determine solutions with 
-    different values for the regularization parameter.
+    problems with a sparsity constraint on the parameters. The SparseStep
+    regression model was proposed in Van den Burg, Groenen, and Alfons (2017)
+    <arxiv:1701.06967>. In the model, a regularization term is added to the
+    regression problem which approximates the counting norm of the parameters.
+    By iteratively improving the approximation a sparse solution to the
+    regression problem can be obtained.  In this package both the standard
+    SparseStep algorithm is implemented as well as a path algorithm which uses
+    golden section search to determine solutions with different values for the
+    regularization parameter.
 License: GPL (>= 2)
 Imports: graphics
 Depends:
@@ -25,4 +25,4 @@ Classification/MSC: 62J05, 62J07
 URL: https://github.com/GjjvdBurg/SparseStep,
      https://arxiv.org/abs/1701.06967
 BugReports: https://github.com/GjjvdBurg/SparseStep
-RoxygenNote: 5.0.1
+RoxygenNote: 7.1.0
