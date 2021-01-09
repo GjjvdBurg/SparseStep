@@ -9,7 +9,7 @@ Authors@R: c(person("Gertjan", "van den Burg", role=c("aut", "cre"),
 Description: Implements the SparseStep model for solving regression
     problems with a sparsity constraint on the parameters. The SparseStep
     regression model was proposed in Van den Burg, Groenen, and Alfons (2017)
-    <arxiv:1701.06967>. In the model, a regularization term is added to the
+    <arXiv:1701.06967>. In the model, a regularization term is added to the
     regression problem which approximates the counting norm of the parameters.
     By iteratively improving the approximation a sparse solution to the
     regression problem can be obtained.  In this package both the standard
