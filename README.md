@@ -43,8 +43,7 @@ the [lasso2](https://cran.r-project.org/web/packages/lasso2/index.html)
 package. First we load the data and create a data matrix and outcome vector:
 
 ```r
-> prostate <- 
-> read.table("http://statweb.stanford.edu/~tibs/ElemStatLearn/datasets/prostate.data")
+> prostate <- read.table("http://statweb.stanford.edu/~tibs/ElemStatLearn/datasets/prostate.data")
 > X <- prostate[prostate$train == T, c(-1, -10)]
 > X <- as.matrix(X)
 > y <- prostate[prostate$train == T, 1]
@@ -127,8 +126,7 @@ transform the input data and disable the intercept:
 Note that since we add the constant through the data matrix it is subject to 
 regularization and therefore sparsity:
 
-![SparseStep regression on Prostate dataset (with 
-constant)](./.github/images/sparsestep_prostate_2.png)
+![SparseStep regression on Prostate dataset (with constant)](./.github/images/sparsestep_prostate_2.png)
 
 For more information and examples, please see the documentation included with 
 the package. In particular, the following pages are good places to start:
